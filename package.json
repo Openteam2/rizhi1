@@ -1,0 +1,15 @@
+{
+  "name": "daily-learning-puzzle",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A local-first daily learning journal with AI note distillation.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "check": "node --check server.mjs && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

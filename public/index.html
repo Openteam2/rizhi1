@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="日知：本地运行的每日学习清单与 AI 提炼工具"
+    />
+    <meta name="theme-color" content="#f3f1ea" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>日知 · 学习清单</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="返回本月">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </span>
+          <span class="brand-copy">
+            <strong>日知</strong>
+            <small>把每天学到的东西，拼成自己的知识地图</small>
+          </span>
+        </a>
+
+        <div class="month-control" aria-label="月份导航">
+          <button class="icon-button" id="prevMonth" title="上个月" aria-label="上个月">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <label class="month-picker-wrap">
+            <span id="monthLabel">2026年11月</span>
+            <input id="monthPicker" type="month" aria-label="选择月份" />
+          </label>
+          <button class="icon-button" id="nextMonth" title="下个月" aria-label="下个月">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button class="text-button today-button" id="todayButton">今天</button>
+        </div>
+
+        <div class="topbar-actions">
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="searchInput" type="search" placeholder="搜索记录…" autocomplete="off" />
+            <kbd>Ctrl K</kbd>
+          </label>
+          <button class="filter-button" id="tagFilterButton" aria-haspopup="menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13 13 20l-9-9V4h7l9 9Z"/><circle cx="8.5" cy="8.5" r="1"/></svg>
+            <span id="tagFilterLabel">标签</span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+          </button>
+          <button class="icon-button soft" id="exportButton" title="导出记录" aria-label="导出记录">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          </button>
+          <button class="icon-button soft" id="settingsButton" title="AI 设置" aria-label="AI 设置">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.16.38.36.72.6 1 .3.3.7.43 1.1.43H21v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+          </button>
+          <button class="primary-button" id="newNoteButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            记录今天
+          </button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <section class="calendar-hero" id="calendarHero" data-style="glass" data-height="standard">
+          <div class="hero-image" id="heroImage"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-topline">
+              <span id="heroMonthLabel">2026 / 11</span>
+              <button class="hero-image-button" id="heroBackgroundButton">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+                更换图片
+              </button>
+            </div>
+            <div class="hero-date-row">
+              <span class="hero-day-number" id="heroDayNumber">7</span>
+              <div class="hero-date-copy">
+                <p id="heroWeekday">星期六</p>
+                <h2 id="heroLunarDate">农历九月廿九</h2>
+                <div class="hero-term-row">
+                  <span id="heroSolarTerm">立冬</span>
+                  <span id="heroYearName">丙午年</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-footline">
+              <span id="heroTodayLabel">今天 · 2026年11月7日</span>
+              <span id="heroRecordSummary">把一天里的所得留在这里</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="board-heading">
+          <div>
+            <div class="eyebrow" id="monthEyebrow">MY LEARNING MAP</div>
+            <h1 id="monthHeadline">本月学习拼图</h1>
+          </div>
+          <div class="month-stats" id="monthStats">
+            <span><strong>0</strong> 天记录</span>
+            <span class="stats-divider"></span>
+            <span><strong>0</strong> 个知识点</span>
+            <span class="stats-divider"></span>
+            <span><strong>0</strong> 条 AI 提炼</span>
+          </div>
+        </section>
+
+        <section class="puzzle-shell" aria-label="月度学习记录">
+          <div class="weekday-row" id="weekdayRow" aria-hidden="true">
+            <span>周一</span><span>周二</span><span>周三</span><span>周四</span>
+            <span>周五</span><span>周六</span><span>周日</span>
+          </div>
+          <div class="puzzle-grid" id="puzzleGrid"></div>
+          <div class="empty-month" id="emptyMonth" hidden>
+            <div class="empty-illustration" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <h2>这个月还没有学习拼图</h2>
+            <p>从今天开始记录一个知识点，它会成为月中第一块拼图。</p>
+            <button class="primary-button" id="emptyCreateButton">写下今天</button>
+          </div>
+        </section>
+
+        <footer class="board-footer">
+          <span><i class="status-dot fresh"></i> AI 提炼有效</span>
+          <span><i class="status-dot stale"></i> 内容已更新，建议重新提炼</span>
+          <span><i class="status-dot none"></i> 尚未提炼</span>
+          <span class="local-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            记录只保存在这台电脑
+          </span>
+        </footer>
+      </main>
+
+      <div class="tag-menu" id="tagMenu" hidden>
+        <div class="tag-menu-head">
+          <strong>按标签筛选</strong>
+          <button id="clearTagFilter">清除</button>
+        </div>
+        <div class="tag-menu-list" id="tagMenuList"></div>
+      </div>
+
+      <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+      <aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+        <div class="drawer-head">
+          <div>
+            <p class="eyebrow">DAILY NOTE</p>
+            <h2 id="drawerDate"></h2>
+          </div>
+          <button class="icon-button" id="closeDrawer" aria-label="关闭详情">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="drawer-actions">
+          <button class="secondary-button" id="drawerEditButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5L8 21H3v-5L14 5Z"/><path d="m12 7 5 5"/></svg>
+            编辑
+          </button>
+          <button class="ai-button" id="drawerAiButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.4 4.2L18 9l-4.6 1.8L12 15l-1.4-4.2L6 9l4.6-1.8L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
+            提炼
+          </button>
+          <button class="icon-button soft" id="drawerExportButton" title="导出此日" aria-label="导出此日">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          </button>
+          <button class="icon-button soft" id="drawerCopyButton" title="复制正文" aria-label="复制正文">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+          </button>
+          <button class="icon-button soft" id="drawerWallpaperButton" title="设置当天壁纸" aria-label="设置当天壁纸">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+          </button>
+          <button class="icon-button soft danger-button" id="drawerDeleteButton" title="删除此日记录" aria-label="删除此日记录">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+
+        <div class="drawer-scroll">
+          <div class="drawer-tags" id="drawerTags"></div>
+          <section class="detail-section">
+            <h3>原始记录</h3>
+            <div class="body-copy" id="drawerBody"></div>
+          </section>
+          <section class="detail-section" id="drawerAttachmentsSection">
+            <h3>附件与录音</h3>
+            <div id="drawerAttachments"></div>
+          </section>
+          <section class="detail-section ai-detail-section">
+            <div class="section-title-row">
+              <h3>AI 提炼</h3>
+              <span class="ai-status-pill" id="drawerAiStatus"></span>
+            </div>
+            <div id="drawerDigest"></div>
+          </section>
+        </div>
+      </aside>
+
+      <section class="editor-screen" id="editorScreen" aria-hidden="true">
+        <header class="editor-topbar">
+          <button class="icon-button editor-close" id="editorClose" aria-label="关闭编辑器">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="editor-date-block">
+            <strong id="editorDateLabel"></strong>
+            <span id="editorDirtyLabel">已保存</span>
+          </div>
+          <div class="editor-tags" id="editorTags">
+            <input id="tagInput" type="text" placeholder="+ 添加标签" maxlength="20" aria-label="添加标签" list="customTagSuggestions" />
+          </div>
+          <div class="editor-actions">
+            <button class="secondary-button" id="saveButton">
+              <span class="button-label">保存</span>
+              <kbd>Ctrl S</kbd>
+            </button>
+            <button class="ai-button" id="editorAiButton">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.4 4.2L18 9l-4.6 1.8L12 15l-1.4-4.2L6 9l4.6-1.8L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
+              <span class="button-label">提炼</span>
+            </button>
+          </div>
+        </header>
+        <div class="editor-paper">
+          <div class="editor-toolbar" aria-label="文本工具">
+            <button class="editor-tool-button" id="editorCopyButton" type="button" title="复制选中文本或全文">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+              复制
+            </button>
+            <button class="editor-tool-button" id="editorFindButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
+              替换
+            </button>
+            <button class="editor-tool-button" id="editorPolishButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.4 4.2L18 9l-4.6 1.8L12 15l-1.4-4.2L6 9l4.6-1.8L12 3Z"/><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg>
+              润色
+            </button>
+            <span class="toolbar-divider"></span>
+            <button class="editor-tool-button" id="editorAttachmentButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20.5 11.5-8.7 8.7a6 6 0 0 1-8.5-8.5l9-9a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+              文件
+            </button>
+            <button class="editor-tool-button" id="editorRecordButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
+              录音
+            </button>
+            <button class="editor-tool-button" id="editorStyleButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 5-14 5 14M6 15h6M15 9h5M17.5 6v3M15 17h5M17.5 14v3"/></svg>
+              样式
+            </button>
+            <button class="editor-tool-button" id="editorWallpaperButton" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>
+              壁纸
+            </button>
+            <button class="editor-tool-button" id="editorPreviewToggleButton" type="button" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 8h4M15 12h4"/></svg>
+              <span>隐藏预览</span>
+            </button>
+            <input id="attachmentInput" type="file" multiple hidden />
+          </div>
+          <div class="replace-panel" id="replacePanel" hidden>
+            <input id="replaceFindInput" type="text" placeholder="查找" aria-label="查找文本" />
+            <input id="replaceWithInput" type="text" placeholder="替换为" aria-label="替换文本" />
+            <button class="secondary-button" id="replaceOneButton" type="button">替换</button>
+            <button class="text-button" id="replaceAllButton" type="button">全部替换</button>
+            <button class="icon-button" id="replaceCloseButton" type="button" aria-label="关闭替换">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+          <div class="editor-style-panel" id="editorStylePanel" hidden>
+            <label>文字层级
+              <select id="quickTextStyle">
+                <option value="body">正文</option>
+                <option value="title">标题</option>
+                <option value="section">小标题</option>
+                <option value="subtitle">副标题</option>
+                <option value="small">小字</option>
+              </select>
+              <span class="style-selection-hint" id="styleSelectionHint">先选中文字</span>
+            </label>
+            <label>样式组
+              <select id="quickStylePreset">
+                <option value="standard">统一排版｜标准运营</option>
+                <option value="brand">统一排版｜品牌专题</option>
+                <option value="data">统一排版｜数据简报</option>
+                <option value="review">统一排版｜审阅精简</option>
+              </select>
+            </label>
+            <label>字体
+              <select id="quickFontFamily">
+                <option value="serif">宋体 / 衬线</option>
+                <option value="sans">微软雅黑 / 无衬线</option>
+                <option value="mono">等宽字体</option>
+              </select>
+            </label>
+            <label>字号
+              <input id="quickFontSize" type="range" min="13" max="24" step="1" />
+              <span id="quickFontSizeLabel">16px</span>
+            </label>
+            <label>行距
+              <input id="quickLineHeight" type="range" min="1.5" max="2.4" step="0.1" />
+              <span id="quickLineHeightLabel">2.0</span>
+            </label>
+          </div>
+          <div class="editor-document-layout" id="editorDocumentLayout">
+            <section class="editor-source-pane">
+              <div class="editor-pane-head">
+                <span>Markdown 源码</span>
+                <small>图片与文字按顺序保存</small>
+              </div>
+              <textarea
+                id="editorBody"
+                spellcheck="false"
+                placeholder="今天学到了什么？&#10;&#10;可以写下一个概念、一个判断，或者一段还没想清楚的问题……"
+                aria-label="学习正文"
+              ></textarea>
+              <div class="editor-attachments" id="editorAttachments" hidden></div>
+            </section>
+            <div
+              class="editor-splitter"
+              id="editorSplitter"
+              role="separator"
+              aria-label="调整源码和预览宽度"
+              aria-orientation="vertical"
+              tabindex="0"
+            ><span></span></div>
+            <section class="editor-preview-wrap" id="editorPreviewWrap">
+              <div class="editor-preview-head">
+                <span>实时排版预览</span>
+                <small>右侧可独立滚动</small>
+              </div>
+              <div class="body-copy editor-preview" id="editorPreview"></div>
+            </section>
+          </div>
+          <datalist id="customTagSuggestions"></datalist>
+        </div>
+        <footer class="editor-footer">
+          <span id="editorCharCount">0 字</span>
+          <span>支持 Markdown · 内容仅保存在本地</span>
+        </footer>
+      </section>
+
+      <div class="modal-layer" id="modalLayer" hidden>
+        <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+      </div>
+
+      <div class="hover-preview" id="hoverPreview" hidden></div>
+      <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
